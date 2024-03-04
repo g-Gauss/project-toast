@@ -1,22 +1,29 @@
 import React from "react";
+import useKeyDown from "../../hooks/useKeyDown";
 
 export const ToastContext = React.createContext();
 
 function ToastProvider({ children }) {
   const [toastMessages, setToastMessages] = React.useState([]);
 
-  function handleAddToast(message, variant) {
-    setToastMessages([
-      ...toastMessages,
+  const clearToasts = React.useCallback(() => {
+    setToastMessages([]);
+  }, []);
+
+  useKeyDown("Escape", clearToasts);
+
+  const handleAddToast = React.useCallback((message, variant) => {
+    setToastMessages((currentToastMessages) => [
+      ...currentToastMessages,
       { message, variant, id: crypto.randomUUID() },
     ]);
-  }
+  });
 
-  function handleDismissToast(id) {
+  const handleDismissToast = React.useCallback((id) => {
     setToastMessages((currentToastMessages) =>
       currentToastMessages.filter((toastMessage) => toastMessage.id !== id)
     );
-  }
+  });
 
   return (
     <ToastContext.Provider
